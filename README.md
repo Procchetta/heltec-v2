@@ -1,5 +1,11 @@
 # 📡 Meshtastic Firmware Builder para Heltec V2 y V2.1
 
+<p align="left">
+  <strong>🌐 Idioma / Language:</strong> 
+  <a href="README.md">🇪🇸 <b>Español</b></a> | 
+  <a href="README_EN.md">🇺🇸 English</a>
+</p>
+
 [![Build Meshtastic Heltec V2 / V2.1](https://github.com/Procchetta/heltec-v2/actions/workflows/build-meshtastic.yml/badge.svg)](https://github.com/Procchetta/heltec-v2/actions/workflows/build-meshtastic.yml)
 [![GitHub release](https://img.shields.io/github/v/release/Procchetta/heltec-v2?label=Última%20Versión)](https://github.com/Procchetta/heltec-v2/releases)
 [![License: GPL-3.0](https://img.shields.io/badge/License-GPL_v3-blue.svg)](LICENSE)
