@@ -25,11 +25,11 @@ Este repositorio resuelve ese problema ejecutando un flujo de **GitHub Actions**
 
 ---
 
-## 📥 Descargas
+## 📥 Descargas y Tipos de Archivo
 
-👉 Puedes descargar los binarios compilados más recientes directamente en la pestaña de **[Releases](https://github.com/Procchetta/heltec-v2/releases)**.
+👉 Puedes descargar los binarios compilados más recientes en la pestaña de **[Releases](https://github.com/Procchetta/heltec-v2/releases)**.
 
-| Placa | Archivo Recomendado (Instalación limpia) | Archivo para Actualización (OTA) |
+| Placa | 🟢 Para Instalación Limpia (Desde Cero) | 🔄 Para Solo Actualizar (Conserva Configuración) |
 | :--- | :--- | :--- |
 | **Heltec V2.0** | `firmware-heltec-v2_0-*-factory.bin` | `firmware-heltec-v2_0-*.bin` |
 | **Heltec V2.1** | `firmware-heltec-v2_1-*-factory.bin` | `firmware-heltec-v2_1-*.bin` |
@@ -47,38 +47,58 @@ Es crucial flashear la versión correcta según tu hardware para que la lectura 
 | **Habilitación de GPS / Ext Notify** | Pin estándar | `PIN_GPS_EN = 37`, `EXT_NOTIFY_OUT = 13` |
 | **Identificador de Hardware** | `HELTEC_V2_0` (Model ID 5) | `HELTEC_V2_1` (Model ID 10) |
 
-> 💡 **Nota:** La placa V2.1 solucionó el conflicto de lectura de batería que ocurría en la V2.0 al activar el WiFi (ya que ADC2 comparte recursos con el módulo WiFi).
+> 💡 **Nota:** La placa V2.1 solucionó el conflicto de lectura de batería que ocurría en la V2.0 al activar el WiFi (ya que ADC2 comparte recursos con el módulo WiFi del ESP32).
 
 ---
 
-## ⚡ Guía de Flasheo
+## ⚡ Guía Detallada de Flasheo
 
-### Método 1: ESP Web Flasher (Directamente desde el navegador) 🌐
-*Recomendado para Chrome o Microsoft Edge en Windows, Mac o Linux.*
+### 🌐 Opción 1: ESP Web Flasher (Desde el Navegador)
+*Recomendado en Chrome o Microsoft Edge vía cable USB.*
 
-1. Conecta tu placa Heltec a la computadora mediante un cable USB de datos.
-2. Ingresa a **[ESP Web Flasher](https://esp.huhn.me/)** o al **[Meshtastic Web Flasher](https://flasher.meshtastic.org/)**.
-3. Haz clic en **Connect** y selecciona el puerto serie correspondiente (ej. `COM3` en Windows o `/dev/ttyUSB0` en Linux/Mac).
-4. Carga el archivo **`*-factory.bin`** en la dirección de memoria **`0x00`**.
-5. Haz clic en **Program** y espera a que termine el proceso.
+#### Caso A: 🟢 Instalación Limpia (Primera vez o restaurar de fábrica)
+1. Conecta tu Heltec y entra a **[ESP Web Flasher (esp.huhn.me)](https://esp.huhn.me/)**.
+2. Haz clic en **Connect** y selecciona el puerto serie de tu placa.
+3. Coloca la dirección (offset): **`0x00`**.
+4. Carga el archivo **`*-factory.bin`**.
+5. *(Opcional)* Marca **Erase Flash** para borrar cualquier dato anterior.
+6. Haz clic en **Program**.
+
+#### Caso B: 🔄 Solo Actualizar (Conservar canales, claves y configuración de nodo)
+1. Conecta tu Heltec y entra a **[ESP Web Flasher (esp.huhn.me)](https://esp.huhn.me/)**.
+2. Haz clic en **Connect** y selecciona el puerto serie de tu placa.
+3. Coloca la dirección (offset): **`0x10000`** *(¡Muy importante!)*.
+4. Carga el archivo de actualización **`*.bin`** *(el que **NO** tiene la palabra factory)*.
+5. ⚠️ **NO marques la opción de Borrar Flash (Erase Flash)**.
+6. Haz clic en **Program**. Al reiniciar, tu nodo mantendrá todos sus canales y ajustes.
 
 ---
 
-### Método 2: Con `esptool.py` (Línea de comandos) 💻
+### 📱 Opción 2: Actualización Inalámbrica OTA (Desde la App de Meshtastic)
+1. Descarga el archivo de actualización **`*.bin`** en tu teléfono o tablet.
+2. Abre la App oficial de Meshtastic (Android/iOS) conectada por Bluetooth a tu placa.
+3. Ve a **Settings** > **Radio Configuration** > **Firmware Update** (o menú de actualización OTA).
+4. Selecciona el archivo `.bin` y confirma la actualización sin cables.
 
-Si prefieres usar la terminal:
+---
 
+### 💻 Opción 3: Con `esptool.py` (Línea de Comandos)
+
+#### Para Instalación Limpia (Borrado completo + Factory):
 ```bash
-# 1. Instalar esptool si no lo tienes
-pip install --upgrade esptool
-
-# 2. Borrar la memoria flash (recomendado en primera instalación)
+# 1. Borrar toda la flash
 esptool.py --chip esp32 --port /dev/ttyUSB0 erase_flash
 
-# 3. Flashear el firmware factory en offset 0x00
+# 2. Escribir factory bin en 0x00
 esptool.py --chip esp32 --port /dev/ttyUSB0 --baud 921600 write_flash 0x00 firmware-heltec-v2_0-vX.X.X-factory.bin
 ```
-*(En Windows, reemplaza `/dev/ttyUSB0` por tu puerto `COMx`).*
+
+#### Para Solo Actualizar (Mantener configuraciones):
+```bash
+# Escribir el binario de aplicación en el offset 0x10000 (sin borrar la flash)
+esptool.py --chip esp32 --port /dev/ttyUSB0 --baud 921600 write_flash 0x10000 firmware-heltec-v2_0-vX.X.X.bin
+```
+*(En Windows reemplaza `/dev/ttyUSB0` por tu puerto `COMx`).*
 
 ---
 

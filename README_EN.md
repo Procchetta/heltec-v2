@@ -25,11 +25,11 @@ This repository solves this by running an automated **GitHub Actions** workflow 
 
 ---
 
-## 📥 Downloads
+## 📥 Downloads & Binary Types
 
-👉 Download the latest compiled binaries directly from the **[Releases](https://github.com/Procchetta/heltec-v2/releases)** tab.
+👉 Download the latest compiled binaries from the **[Releases](https://github.com/Procchetta/heltec-v2/releases)** tab.
 
-| Board | Recommended File (Clean Install) | Update File (OTA) |
+| Board | 🟢 For Clean Installation (Full Flash) | 🔄 For Firmware Update Only (Keeps Settings) |
 | :--- | :--- | :--- |
 | **Heltec V2.0** | `firmware-heltec-v2_0-*-factory.bin` | `firmware-heltec-v2_0-*.bin` |
 | **Heltec V2.1** | `firmware-heltec-v2_1-*-factory.bin` | `firmware-heltec-v2_1-*.bin` |
@@ -51,34 +51,54 @@ It is crucial to flash the correct binary according to your hardware revision fo
 
 ---
 
-## ⚡ Flashing Guide
+## ⚡ Detailed Flashing Guide
 
-### Method 1: ESP Web Flasher (Browser-based) 🌐
-*Recommended using Google Chrome or Microsoft Edge on Windows, Mac, or Linux.*
+### 🌐 Option 1: ESP Web Flasher (Browser-based)
+*Recommended using Google Chrome or Microsoft Edge with a USB data cable.*
 
-1. Connect your Heltec board to your computer with a data USB cable.
-2. Navigate to **[ESP Web Flasher](https://esp.huhn.me/)** or the **[Meshtastic Web Flasher](https://flasher.meshtastic.org/)**.
-3. Click **Connect** and select the serial port (e.g., `COM3` on Windows or `/dev/ttyUSB0` on Linux/Mac).
-4. Load the **`*-factory.bin`** file at memory offset **`0x00`**.
-5. Click **Program** and wait for the process to complete.
+#### Case A: 🟢 Clean Installation (First time or factory reset)
+1. Connect your Heltec board and open **[ESP Web Flasher (esp.huhn.me)](https://esp.huhn.me/)**.
+2. Click **Connect** and select your board's serial port.
+3. Set the memory address (offset): **`0x00`**.
+4. Select the **`*-factory.bin`** file.
+5. *(Optional)* Check **Erase Flash** to wipe all previous data.
+6. Click **Program**.
+
+#### Case B: 🔄 Update Only (Preserve channels, keys, and node settings)
+1. Connect your Heltec board and open **[ESP Web Flasher (esp.huhn.me)](https://esp.huhn.me/)**.
+2. Click **Connect** and select your board's serial port.
+3. Set the memory address (offset): **`0x10000`** *(Crucial step!)*.
+4. Select the update file **`*.bin`** *(the one **WITHOUT** "factory" in its name)*.
+5. ⚠️ **DO NOT check Erase Flash**.
+6. Click **Program**. Upon reboot, your device retains all configured channels and node names.
 
 ---
 
-### Method 2: Using `esptool.py` (Command Line) 💻
+### 📱 Option 2: Wireless OTA Update (Meshtastic Mobile App)
+1. Download the update file **`*.bin`** onto your phone or tablet.
+2. Open the official Meshtastic App (Android / iOS) connected to your node via Bluetooth.
+3. Go to **Settings** > **Radio Configuration** > **Firmware Update** (or OTA menu).
+4. Select the downloaded `.bin` file to start the wireless update.
 
-If you prefer using the terminal:
+---
 
+### 💻 Option 3: Using `esptool.py` (Command Line)
+
+#### For Clean Installation (Full erase + factory image):
 ```bash
-# 1. Install esptool if not already installed
-pip install --upgrade esptool
-
-# 2. Erase the flash memory (recommended for clean installations)
+# 1. Erase flash memory completely
 esptool.py --chip esp32 --port /dev/ttyUSB0 erase_flash
 
-# 3. Flash the factory firmware at offset 0x00
+# 2. Flash factory bin at offset 0x00
 esptool.py --chip esp32 --port /dev/ttyUSB0 --baud 921600 write_flash 0x00 firmware-heltec-v2_0-vX.X.X-factory.bin
 ```
-*(On Windows, replace `/dev/ttyUSB0` with your corresponding `COMx` port).*
+
+#### For Firmware Update Only (Preserve settings):
+```bash
+# Flash the application binary at offset 0x10000 without erasing
+esptool.py --chip esp32 --port /dev/ttyUSB0 --baud 921600 write_flash 0x10000 firmware-heltec-v2_0-vX.X.X.bin
+```
+*(On Windows, replace `/dev/ttyUSB0` with your `COMx` port).*
 
 ---
 
