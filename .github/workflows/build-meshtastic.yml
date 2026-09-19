@@ -139,43 +139,36 @@ jobs:
           mkdir -p release_assets
 
           echo "Collecting binaries for heltec-v2_0..."
-          find firmware_src/.pio/build/heltec-v2_0/ -maxdepth 1 -type f \( -name "*.bin" -o -name "*.elf" \)
-          
-          # Copiar archivos generados para Heltec V2.0
           if [ -f firmware_src/.pio/build/heltec-v2_0/firmware.factory.bin ]; then
             cp firmware_src/.pio/build/heltec-v2_0/firmware.factory.bin "release_assets/firmware-heltec-v2_0-${TAG}-factory.bin"
           fi
           if [ -f firmware_src/.pio/build/heltec-v2_0/firmware.bin ]; then
             cp firmware_src/.pio/build/heltec-v2_0/firmware.bin "release_assets/firmware-heltec-v2_0-${TAG}.bin"
           fi
-          find firmware_src/.pio/build/heltec-v2_0/ -name "firmware-heltec-v2_0-*.bin" -exec cp {} release_assets/ \; || true
+          find firmware_src/.pio/build/heltec-v2_0/ -maxdepth 1 -name "firmware-heltec-v2_0-*.bin" -exec cp {} release_assets/ \; || true
 
           echo "Collecting binaries for heltec-v2_1..."
-          find firmware_src/.pio/build/heltec-v2_1/ -maxdepth 1 -type f \( -name "*.bin" -o -name "*.elf" \)
-          
-          # Copiar archivos generados para Heltec V2.1
           if [ -f firmware_src/.pio/build/heltec-v2_1/firmware.factory.bin ]; then
             cp firmware_src/.pio/build/heltec-v2_1/firmware.factory.bin "release_assets/firmware-heltec-v2_1-${TAG}-factory.bin"
           fi
           if [ -f firmware_src/.pio/build/heltec-v2_1/firmware.bin ]; then
             cp firmware_src/.pio/build/heltec-v2_1/firmware.bin "release_assets/firmware-heltec-v2_1-${TAG}.bin"
           fi
-          find firmware_src/.pio/build/heltec-v2_1/ -name "firmware-heltec-v2_1-*.bin" -exec cp {} release_assets/ \; || true
+          find firmware_src/.pio/build/heltec-v2_1/ -maxdepth 1 -name "firmware-heltec-v2_1-*.bin" -exec cp {} release_assets/ \; || true
 
-          # Copiar particiones y bootloader de referencia
-          mkdir -p release_assets/partitions
-          cp firmware_src/.pio/build/heltec-v2_0/bootloader.bin release_assets/partitions/bootloader.bin 2>/dev/null || true
-          cp firmware_src/.pio/build/heltec-v2_0/partitions.bin release_assets/partitions/partitions.bin 2>/dev/null || true
+          # Copiar bootloader y particiones si existen
+          cp firmware_src/.pio/build/heltec-v2_0/bootloader.bin release_assets/bootloader.bin 2>/dev/null || true
+          cp firmware_src/.pio/build/heltec-v2_0/partitions.bin release_assets/partitions.bin 2>/dev/null || true
 
-          # Crear archivo ZIP con todo el bundle
+          # Crear archivo ZIP con todo el contenido
           cd release_assets
           zip -r "../meshtastic-heltec-v2-bundle-${TAG}.zip" ./*
           cd ..
           mv "meshtastic-heltec-v2-bundle-${TAG}.zip" release_assets/
 
-          # Generar checksums SHA256
+          # Generar sumas de verificación SHA256 únicamente sobre archivos
           cd release_assets
-          sha256sum * > SHA256SUMS.txt
+          sha256sum *.bin *.zip > SHA256SUMS.txt
           cd ..
 
           echo "Contenido final de release_assets:"
