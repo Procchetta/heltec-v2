@@ -1,0 +1,28 @@
+# PlatformIO
+.pio/
+.pioenvs/
+.piolibdeps/
+
+# Meshtastic Source & Compilation Directories
+firmware_src/
+build_output/
+release_assets/
+*.zip
+*.bin
+*.elf
+*.hex
+
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+.venv/
+venv/
+ENV/
+
+# IDEs and OS
+.vscode/
+.idea/
+.DS_Store
+*.swp
+*~
